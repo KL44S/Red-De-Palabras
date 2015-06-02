@@ -259,13 +259,16 @@ int main() {
 		return EJECUCION_FALLIDA;
 	}
 
-	cout << "palabras positivas:" << palabrasP << endl;
-	cout << "palabras negativas" << palabrasN << endl;
+	cout << "palabras positivas: " << palabrasP << endl;
+	cout << "palabras negativas: " << palabrasN << endl;
 
 	ofstream resultfile("resultado.tsv");
 	resultfile << "id,sentiment\n";
 
 	int clasificadas = 0;
+	int reviewsPositivos = 0;
+	int reviewsNegativos = 0;
+
 	ifstream testfile ("testData.tsv");
 	getline(testfile,line);
 	if (testfile.is_open()){
@@ -280,8 +283,14 @@ int main() {
 			destroy_token_list(tokens);
 
 			string lineaResultado = getid(line);
-			if((pesoPositivo + 5) > pesoNegativo) lineaResultado += ",1\n";
-			else lineaResultado += ",0\n";
+			if((pesoPositivo + 5) > pesoNegativo) {
+				lineaResultado += ",1\n";
+				reviewsPositivos ++;
+			}
+			else{
+				lineaResultado += ",0\n";
+				reviewsNegativos ++;
+			}
 
 			resultfile << lineaResultado;
 
@@ -295,6 +304,8 @@ int main() {
 		cout << "error al abrir archivo de clasificacion" << endl;
 		return EJECUCION_FALLIDA;
 	}
+	cout << "Reviews negativos: " << reviewsNegativos << endl;
+	cout << "Reviews positivos: " << reviewsPositivos << endl;
 
 
 return EJECUCION_EXISTOSA;
