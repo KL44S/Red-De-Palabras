@@ -20,8 +20,8 @@
 ** Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 */
 
-#ifndef   	REVIEWS_SRC_TRIEFACTORY_HXX_
-# define   	REVIEWS_SRC_TRIEFACTORY_HXX_
+#ifndef   	TRIEFACTORY_HXX_
+# define   	TRIEFACTORY_HXX_
 
 #include "TrieFactory.h"
 #include "TrieNode.hxx"
@@ -70,4 +70,4 @@ void ToolBox::TrieFactory<T>::clear()
   _nbUsedInLastNodes = 0;
 }
 
-#endif	    /* !REVIEWS_SRC_TRIEFACTORY_HXX_ */
+#endif	    /* !TRIEFACTORY_HXX_ */

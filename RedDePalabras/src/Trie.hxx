@@ -20,8 +20,8 @@
 ** Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 */
 
-#ifndef   	REVIEWS_SRC_TRIE_HXX_
-# define   	REVIEWS_SRC_TRIE_HXX_
+#ifndef   	TRIE_HXX_
+# define   	TRIE_HXX_
 
 #include "Trie.h"
 #include <vector>
@@ -143,4 +143,4 @@ void ToolBox::Trie<T>::display(std::ostream &os)
     _initialNode->display(os, 0, 0);
 }
 
-#endif	    /* !REVIEWS_SRC_TRIE_HXX_ */
+#endif	    /* !TRIE_HXX_ */
