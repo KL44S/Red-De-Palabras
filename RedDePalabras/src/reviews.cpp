@@ -194,6 +194,18 @@ void eliminarStopWords(string& str){
 		pos = str.find(" in ");
 	}
 
+	pos = str.find(" on ");
+	while (pos != -1){
+		str.erase(pos+1,3);
+		pos = str.find(" on ");
+	}
+
+	pos = str.find(" or ");
+	while (pos != -1){
+		str.erase(pos+1,3);
+		pos = str.find(" or ");
+	}
+
 	pos = str.find(" and ");
 	while (pos != -1){
 		str.erase(pos+1,4);
@@ -304,9 +316,19 @@ int main() {
 		cout << "error al abrir archivo de clasificacion" << endl;
 		return EJECUCION_FALLIDA;
 	}
+
+	//REVIEWS POSITIVOS Y NEGATIVOS
 	cout << "Reviews negativos: " << reviewsNegativos << endl;
 	cout << "Reviews positivos: " << reviewsPositivos << endl;
 
+	//PORCENTAJE DE EFECTIVIDAD
+	int total = ((reviewsNegativos + reviewsPositivos) / 2);
+	int porcentaje = ( (reviewsNegativos * 100) / total);
+	if(porcentaje <= 100) cout << "Porcentaje de efectividad" << porcentaje << "%" << endl;
+	else {
+		int porcentaje = ( (reviewsPositivos * 100) / total);
+		if(porcentaje <= 100) cout << porcentaje << "%" << endl;
+	}
 
 return EJECUCION_EXISTOSA;
 }
