@@ -13,6 +13,8 @@
 #include "tokenizer.h"
 #include <string.h>
 #include <math.h>
+#include "Constantes.h"
+
 using namespace std;
 
 struct nodoGrafo{
@@ -221,9 +223,6 @@ void eliminarStopWords(string& str){
 
 
 int main() {
-	cout << "!!!Hello World!!!" << endl; // prints !!!Hello World!!!
-
-
 	int procesadas = 0;
 	int palabrasP = 0;
 	int palabrasN = 0;
@@ -254,6 +253,10 @@ int main() {
 			procesadas++;
 		}
 		myfile.close();
+	}
+	else{
+		cout << "error al abrir archivo de entrenamiento" << endl;
+		return EJECUCION_FALLIDA;
 	}
 
 	cout << "palabras positivas:" << palabrasP << endl;
@@ -288,8 +291,11 @@ int main() {
 
 		}
 	}
+	else {
+		cout << "error al abrir archivo de clasificacion" << endl;
+		return EJECUCION_FALLIDA;
+	}
 
 
-
-return 0;
+return EJECUCION_EXISTOSA;
 }

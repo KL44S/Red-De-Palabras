@@ -20,8 +20,8 @@
 ** Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 */
 
-#ifndef   	TRIE_H_
-# define   	TRIE_H_
+#ifndef   	REVIEWS_SRC_TRIE_H_
+# define   	REVIEWS_SRC_TRIE_H_
 
 #include <iostream>
 
@@ -83,4 +83,4 @@ namespace ToolBox
     };
 }
 
-#endif 	    /* !TRIE_H_ */
+#endif 	    /* !REVIEWS_SRC_TRIE_H_ */

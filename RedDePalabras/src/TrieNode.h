@@ -20,8 +20,8 @@
 ** Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 */
 
-#ifndef   	TRIENODE_H_
-# define   	TRIENODE_H_
+#ifndef   	REVIEWS_SRC_TRIENODE_H_
+# define   	REVIEWS_SRC_TRIENODE_H_
 
 namespace ToolBox
 {
@@ -106,4 +106,4 @@ namespace ToolBox
   };
 }
 
-#endif 	    /* !TRIENODE_H_ */
+#endif 	    /* !REVIEWS_SRC_TRIENODE_H_ */

@@ -20,8 +20,8 @@
 ** Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 */
 
-#ifndef   	TRIEFACTORY_H_
-# define   	TRIEFACTORY_H_
+#ifndef   	REVIEWS_SRC_TRIEFACTORY_H_
+# define   	REVIEWS_SRC_TRIEFACTORY_H_
 
 #include <list>
 
@@ -62,4 +62,4 @@ namespace ToolBox
     };
 }
 
-#endif 	    /* !TRIEFACTORY_H_ */
+#endif 	    /* !REVIEWS_SRC_TRIEFACTORY_H_ */
