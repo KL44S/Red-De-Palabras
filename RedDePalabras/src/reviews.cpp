@@ -15,6 +15,7 @@
 #include <math.h>
 #include "Constantes.h"
 #include "StopWordsManager.h"
+#include "Parser.h"
 
 using namespace std;
 
@@ -23,7 +24,7 @@ struct nodoGrafo{
 	int ocurrencias;
 };
 
-
+/*
 // recive la linea con el id, sentiment y review. Devuelve review
 string getReview_Entrenamiento(string str){
 
@@ -41,7 +42,7 @@ unsigned int getSentiment(string str){
 	// este asco convierte el caracter a int
 	return (((int) str[pos]) - '0');
 }
-
+*/
 
 // agrega una palabra al grafo y devuelve la posicion donde se agrego
 int agregarPalabra(vector<list<nodoGrafo> > &grafo,ToolBox::Trie<int> &trie,
@@ -96,8 +97,7 @@ void entrenarGrafo(vector<list<nodoGrafo> >& grafo,ToolBox::Trie<int>& trie,
 
 }
 
-void entrenar(vector<list<nodoGrafo> >& grafo,ToolBox::Trie<int>& trie,
-											char** &tokens,int& palabras){
+void entrenar(vector<list<nodoGrafo> >& grafo,ToolBox::Trie<int>& trie, char** &tokens,int& palabras){
 
 	int i = 0;
 	while(tokens[i+1] != NULL){
@@ -105,7 +105,7 @@ void entrenar(vector<list<nodoGrafo> >& grafo,ToolBox::Trie<int>& trie,
 		i++;
 	}
 }
-
+/*
 string getid (string str){
 
 	int pos = str.find('\t');
@@ -120,7 +120,7 @@ string getTestReview(string str){
 
 	return str.substr(pos+2);
 }
-
+*/
 int getPesoEntrePalabras(vector<list<nodoGrafo> >& grafo,ToolBox::Trie<int>& trie,
 					char* palabra1, char* palabra2){
 
@@ -172,40 +172,30 @@ int main() {
 	int procesadas = 0;
 	int palabrasP = 0;
 	int palabrasN = 0;
-	StopWordsManager* unStopWordsManager = new StopWordsManager();
-
+	int sentimiento;
+	char** tokens;
 	// creo tries y grafos, positivos y negativos
 	ToolBox::Trie<int> trieP(-1);
 	vector<list<nodoGrafo> > grafoP;
 	ToolBox::Trie<int> trieN(-1);
 	vector<list<nodoGrafo> > grafoN;
-	int sentimiento;
 
-	string line;
+	Parser* unParser = new Parser();
 	ifstream myfile ("labeledTrainData.tsv");
-	getline(myfile,line);
-	if (myfile.is_open()){
-
-		while	(getline(myfile,line)){
-			string review = getReview_Entrenamiento(line);
-			transform(review.begin(), review.end(), review.begin(), ::tolower);
-			unStopWordsManager->eliminarStopWords(review);
-			char** tokens = tokenize(review.c_str());
-
-			sentimiento = getSentiment(line);
-			if(sentimiento == 1) entrenar(grafoP,trieP,tokens,palabrasP);
-			else if(sentimiento == 0) entrenar(grafoN,trieN,tokens,palabrasN);
-			if((procesadas % 600) == 0){
-				cout << procesadas << endl;
-			}
-			destroy_token_list(tokens);
-			procesadas++;
-		}
-		myfile.close();
-	}
-	else{
-		cout << "error al abrir archivo de entrenamiento" << endl;
+	if(!unParser->setArchivo(&myfile)){
+		delete unParser;
 		return EJECUCION_FALLIDA;
+	}
+
+	while(unParser->parsearLineaEntrenamiento()){
+		sentimiento = unParser->getSentimiento();
+		tokens = unParser->getTokens();
+		if(sentimiento == 1) entrenar(grafoP,trieP,tokens,palabrasP);
+		else if(sentimiento == 0) entrenar(grafoN,trieN,tokens,palabrasN);
+		if((procesadas % 600) == 0){
+			cout << procesadas << endl;
+		}
+		procesadas++;
 	}
 
 	cout << "palabras positivas: " << palabrasP << endl;
@@ -219,53 +209,40 @@ int main() {
 	int reviewsNegativos = 0;
 
 	ifstream testfile ("testData.tsv");
-	getline(testfile,line);
-	if (testfile.is_open()){
-		while (getline(testfile,line)){
-			string testReview = getTestReview(line);
-			transform(testReview.begin(),testReview.end(), testReview.begin(), ::tolower);
-			unStopWordsManager->eliminarStopWords(testReview);
-			char** tokens = tokenize(testReview.c_str());
-
-			int pesoPositivo = getPeso(grafoP,trieP,tokens);
-			int pesoNegativo = getPeso(grafoN,trieN,tokens);
-			destroy_token_list(tokens);
-
-			string lineaResultado = getid(line);
-			if((pesoPositivo + 5) > pesoNegativo) {
-				lineaResultado += ",1\n";
-				reviewsPositivos ++;
-			}
-			else{
-				lineaResultado += ",0\n";
-				reviewsNegativos ++;
-			}
-
-			resultfile << lineaResultado;
-
-			if ((clasificadas % 500) == 0) cout << clasificadas << endl;
-			clasificadas ++;
-
-		}
-		testfile.close();
-	}
-	else {
-		cout << "error al abrir archivo de clasificacion" << endl;
+	if(!unParser->setArchivo(&testfile)){
+		delete unParser;
 		return EJECUCION_FALLIDA;
+	}
+
+	while(unParser->parsearLineaTest()){
+		tokens = unParser->getTokens();
+		int pesoPositivo = getPeso(grafoP,trieP,tokens);
+		int pesoNegativo = getPeso(grafoN,trieN,tokens);
+
+		string lineaResultado = unParser->getLineaResultado();
+		if((pesoPositivo + 5) > pesoNegativo) {
+			lineaResultado += ",1\n";
+			reviewsPositivos ++;
+		}
+		else{
+			lineaResultado += ",0\n";
+			reviewsNegativos ++;
+		}
+
+		resultfile << lineaResultado;
+
+		if ((clasificadas % 500) == 0) {
+			cout << clasificadas << endl;
+		}
+		clasificadas ++;
+
 	}
 
 	//REVIEWS POSITIVOS Y NEGATIVOS
 	cout << "Reviews negativos: " << reviewsNegativos << endl;
 	cout << "Reviews positivos: " << reviewsPositivos << endl;
 
-	//PORCENTAJE DE EFECTIVIDAD
-	float total = (clasificadas / 2);
-	float porcentaje = ( (reviewsNegativos * 100) / total );
-	if(porcentaje <= 100) cout << "Porcentaje de efectividad: " << porcentaje << "%" << endl;
-	else {
-		porcentaje = ( (reviewsPositivos * 100) / total);
-		if(porcentaje <= 100) cout << "Porcentaje de efectividad: " << porcentaje << "%" << endl;
-	}
+	delete unParser;
 
 return EJECUCION_EXISTOSA;
 }
