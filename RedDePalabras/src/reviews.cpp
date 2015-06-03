@@ -12,10 +12,12 @@
 #include "Exception.h"
 #include "tokenizer.h"
 #include <string.h>
+#include <string>
 #include <math.h>
 #include "Constantes.h"
 #include "StopWordsManager.h"
 #include "Parser.h"
+#include <sstream>
 
 using namespace std;
 
@@ -23,26 +25,6 @@ struct nodoGrafo{
 	int nPalabra;
 	int ocurrencias;
 };
-
-/*
-// recive la linea con el id, sentiment y review. Devuelve review
-string getReview_Entrenamiento(string str){
-
-	int pos = str.find("_");
-	pos = pos + 6;
-
-	return str.substr(pos);
-}
-
-unsigned int getSentiment(string str){
-
-	int pos = str.find("_");
-	pos = pos + 4;
-
-	// este asco convierte el caracter a int
-	return (((int) str[pos]) - '0');
-}
-*/
 
 // agrega una palabra al grafo y devuelve la posicion donde se agrego
 int agregarPalabra(vector<list<nodoGrafo> > &grafo,ToolBox::Trie<int> &trie,
@@ -105,22 +87,7 @@ void entrenar(vector<list<nodoGrafo> >& grafo,ToolBox::Trie<int>& trie, char** &
 		i++;
 	}
 }
-/*
-string getid (string str){
 
-	int pos = str.find('\t');
-	pos = pos + 6;
-
-	return str.substr(1,pos-8);
-}
-
-string getTestReview(string str){
-
-	int pos = str.find('\t');
-
-	return str.substr(pos+2);
-}
-*/
 int getPesoEntrePalabras(vector<list<nodoGrafo> >& grafo,ToolBox::Trie<int>& trie,
 					char* palabra1, char* palabra2){
 
@@ -172,13 +139,19 @@ int main() {
 	int procesadas = 0;
 	int palabrasP = 0;
 	int palabrasN = 0;
+	size_t o;
+	string porcentaje;
+	stringstream stream;
 	int sentimiento;
 	char** tokens;
+
 	// creo tries y grafos, positivos y negativos
 	ToolBox::Trie<int> trieP(-1);
 	vector<list<nodoGrafo> > grafoP;
 	ToolBox::Trie<int> trieN(-1);
 	vector<list<nodoGrafo> > grafoN;
+
+	//ENTRENAMIENTO
 
 	Parser* unParser = new Parser();
 	ifstream myfile ("labeledTrainData.tsv");
@@ -187,20 +160,33 @@ int main() {
 		return EJECUCION_FALLIDA;
 	}
 
+	cout << "Entrenando..." << endl;
 	while(unParser->parsearLineaEntrenamiento()){
 		sentimiento = unParser->getSentimiento();
 		tokens = unParser->getTokens();
 		if(sentimiento == 1) entrenar(grafoP,trieP,tokens,palabrasP);
 		else if(sentimiento == 0) entrenar(grafoN,trieN,tokens,palabrasN);
-		if((procesadas % 600) == 0){
-			cout << procesadas << endl;
+
+		//	muestro porcentaje de completado
+		for(o = 0; o < 14; o++){
+			cout << "\b";
 		}
+		cout << ((procesadas * 100) / REVIEWS_TOTAL) << "% completado";
+
 		procesadas++;
 	}
 
+	//	muestro porcentaje de completado final
+	for(o = 0; o < 14; o++){
+		cout << "\b";
+	}
+	cout << "100% completado" << endl;
 	cout << "palabras positivas: " << palabrasP << endl;
 	cout << "palabras negativas: " << palabrasN << endl;
 
+	//CLASIFICACION
+	cout << endl;
+	cout << "Clasificando..." << endl;
 	ofstream resultfile("resultado.tsv");
 	resultfile << "id,sentiment\n";
 
@@ -231,18 +217,25 @@ int main() {
 
 		resultfile << lineaResultado;
 
-		if ((clasificadas % 500) == 0) {
-			cout << clasificadas << endl;
+		//	muestro porcentaje de completado
+		for(o = 0; o < 14; o++){
+			cout << "\b";
 		}
+		cout << ((clasificadas * 100) / REVIEWS_TOTAL) << "% completado";
+
 		clasificadas ++;
 
 	}
 
+	//	muestro porcentaje de completado final
+	for(o = 0; o < 14; o++){
+		cout << "\b";
+	}
+	cout << "100% completado" << endl;
 	//REVIEWS POSITIVOS Y NEGATIVOS
 	cout << "Reviews negativos: " << reviewsNegativos << endl;
 	cout << "Reviews positivos: " << reviewsPositivos << endl;
 
 	delete unParser;
-
 return EJECUCION_EXISTOSA;
 }

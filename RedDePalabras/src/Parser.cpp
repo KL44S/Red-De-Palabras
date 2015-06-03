@@ -61,7 +61,9 @@ string getTestReview(string str){
 
 bool Parser::setArchivo(ifstream* archivo){
 	if(myfile != NULL){
-		if(myfile->is_open()) myfile->close();
+		if(myfile->is_open()){
+			myfile->close();
+		}
 	}
 	myfile = archivo;
 	if (myfile->is_open()) {
@@ -117,7 +119,11 @@ string Parser::getLineaResultado(){
 }
 
 Parser::~Parser() {
-	myfile->close();
-	delete unStopWordsManager;
+	if(myfile != NULL) {
+		myfile->close();
+	}
+	if(unStopWordsManager != NULL) {
+		delete unStopWordsManager;
+	}
 }
 
