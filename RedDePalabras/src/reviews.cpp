@@ -14,6 +14,7 @@
 #include <string.h>
 #include <math.h>
 #include "Constantes.h"
+#include "StopWordsManager.h"
 
 using namespace std;
 
@@ -166,78 +167,12 @@ int getPeso(vector<list<nodoGrafo> >& grafo,ToolBox::Trie<int>& trie,
 	return recorrido;
 }
 
-void eliminarStopWords(string& str){
-
-	int pos;
-
-	pos = str.find(" a ");
-	while (pos != -1){
-		str.erase(pos+1,2);
-		pos = str.find(" a ");
-	}
-
-	pos = str.find(" an ");
-	while (pos != -1){
-		str.erase(pos+1,3);
-		pos = str.find(" an ");
-	}
-
-	pos = str.find(" by ");
-	while (pos != -1){
-		str.erase(pos+1,3);
-		pos = str.find(" by ");
-	}
-
-	pos = str.find(" in ");
-	while (pos != -1){
-		str.erase(pos+1,3);
-		pos = str.find(" in ");
-	}
-
-	pos = str.find(" on ");
-	while (pos != -1){
-		str.erase(pos+1,3);
-		pos = str.find(" on ");
-	}
-
-	pos = str.find(" or ");
-	while (pos != -1){
-		str.erase(pos+1,3);
-		pos = str.find(" or ");
-	}
-
-	pos = str.find(" and ");
-	while (pos != -1){
-		str.erase(pos+1,4);
-		pos = str.find(" and ");
-	}
-
-	pos = str.find(" the ");
-	while (pos != -1){
-		str.erase(pos+1,4);
-		pos = str.find(" the ");
-	}
-
-	pos = str.find(" her ");
-	while (pos != -1){
-		str.erase(pos+1,4);
-		pos = str.find(" her ");
-	}
-
-	pos = str.find(" his ");
-	while (pos != -1){
-		str.erase(pos+1,4);
-		pos = str.find(" his ");
-	}
-
-}
-
-
 
 int main() {
 	int procesadas = 0;
 	int palabrasP = 0;
 	int palabrasN = 0;
+	StopWordsManager* unStopWordsManager = new StopWordsManager();
 
 	// creo tries y grafos, positivos y negativos
 	ToolBox::Trie<int> trieP(-1);
@@ -254,13 +189,15 @@ int main() {
 		while	(getline(myfile,line)){
 			string review = getReview_Entrenamiento(line);
 			transform(review.begin(), review.end(), review.begin(), ::tolower);
-			eliminarStopWords(review);
+			unStopWordsManager->eliminarStopWords(review);
 			char** tokens = tokenize(review.c_str());
 
 			sentimiento = getSentiment(line);
 			if(sentimiento == 1) entrenar(grafoP,trieP,tokens,palabrasP);
 			else if(sentimiento == 0) entrenar(grafoN,trieN,tokens,palabrasN);
-			if((procesadas % 600) == 0) cout << procesadas <<endl;
+			if((procesadas % 600) == 0){
+				cout << procesadas << endl;
+			}
 			destroy_token_list(tokens);
 			procesadas++;
 		}
@@ -287,7 +224,7 @@ int main() {
 		while (getline(testfile,line)){
 			string testReview = getTestReview(line);
 			transform(testReview.begin(),testReview.end(), testReview.begin(), ::tolower);
-			eliminarStopWords(testReview);
+			unStopWordsManager->eliminarStopWords(testReview);
 			char** tokens = tokenize(testReview.c_str());
 
 			int pesoPositivo = getPeso(grafoP,trieP,tokens);
@@ -309,8 +246,8 @@ int main() {
 			if ((clasificadas % 500) == 0) cout << clasificadas << endl;
 			clasificadas ++;
 
-
 		}
+		testfile.close();
 	}
 	else {
 		cout << "error al abrir archivo de clasificacion" << endl;
@@ -322,12 +259,12 @@ int main() {
 	cout << "Reviews positivos: " << reviewsPositivos << endl;
 
 	//PORCENTAJE DE EFECTIVIDAD
-	int total = ((reviewsNegativos + reviewsPositivos) / 2);
-	int porcentaje = ( (reviewsNegativos * 100) / total);
-	if(porcentaje <= 100) cout << "Porcentaje de efectividad" << porcentaje << "%" << endl;
+	float total = (clasificadas / 2);
+	float porcentaje = ( (reviewsNegativos * 100) / total );
+	if(porcentaje <= 100) cout << "Porcentaje de efectividad: " << porcentaje << "%" << endl;
 	else {
-		int porcentaje = ( (reviewsPositivos * 100) / total);
-		if(porcentaje <= 100) cout << porcentaje << "%" << endl;
+		porcentaje = ( (reviewsPositivos * 100) / total);
+		if(porcentaje <= 100) cout << "Porcentaje de efectividad: " << porcentaje << "%" << endl;
 	}
 
 return EJECUCION_EXISTOSA;
