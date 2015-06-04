@@ -84,7 +84,7 @@ void SinonimosManager::reemplazarSinonimosDe(string& unReview){
 				tamanio = sinonimoAreemplazar.size() - 1;
 				pos = unReview.find(sinonimoAreemplazar);
 				while (pos != -1){
-					unReview.erase(pos, tamanio);
+					unReview.replace(pos, tamanio, sinonimo);
 					pos = unReview.find(sinonimoAreemplazar);
 				}
 			}
