@@ -16,6 +16,22 @@ StopWordsManager::StopWordsManager() {
 	if (myfile.is_open()){
 		while (getline(myfile,line)){
 			stopWords.push_back(" " + line + " ");
+			stopWords.push_back("," + line + " ");
+			stopWords.push_back(" " + line + ",");
+			stopWords.push_back("." + line + " ");
+			stopWords.push_back(" " + line + ".");
+			stopWords.push_back("," + line + ",");
+			stopWords.push_back("." + line + ".");
+			stopWords.push_back("," + line + ".");
+			stopWords.push_back("." + line + ",");
+			stopWords.push_back(";" + line + " ");
+			stopWords.push_back(" " + line + ";");
+			stopWords.push_back(";" + line + ";");
+			stopWords.push_back(";" + line + ",");
+			stopWords.push_back("," + line + ";");
+			stopWords.push_back(";" + line + ".");
+			stopWords.push_back("." + line + ";");
+
 		}
 		myfile.close();
 	}
