@@ -237,5 +237,6 @@ int main() {
 	cout << "Reviews positivos: " << reviewsPositivos << endl;
 
 	delete unParser;
+
 return EJECUCION_EXISTOSA;
 }

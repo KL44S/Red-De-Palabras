@@ -9,6 +9,7 @@
 #define PARSER_H_
 #include "tokenizer.h"
 #include "StopWordsManager.h"
+#include "SinonimosManager.h"
 #include <iostream>
 #include <fstream>
 #include <math.h>
@@ -31,6 +32,7 @@ public:
 
 private:
 	StopWordsManager* unStopWordsManager;
+	SinonimosManager* sinonimosManager;
 	int sentimiento;
 	char** tokens;
 	string line;

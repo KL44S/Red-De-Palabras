@@ -20,6 +20,7 @@ using namespace std;
 
 Parser::Parser() {
 	unStopWordsManager = new StopWordsManager();
+	sinonimosManager = new SinonimosManager();
 }
 
 // recive la linea con el id, sentiment y review. Devuelve review
@@ -81,6 +82,7 @@ bool Parser::parsearLineaTest(){
 		string review = getTestReview(line);
 		transform(review.begin(), review.end(), review.begin(), ::tolower);
 		unStopWordsManager->eliminarStopWords(review);
+		sinonimosManager->reemplazarSinonimosDe(review);
 		tokens = tokenize(review.c_str());
 		sentimiento = getSentiment(line);
 		lineaResultado = getid(line);
@@ -95,6 +97,7 @@ bool Parser::parsearLineaEntrenamiento(){
 		string review = getReview_Entrenamiento(line);
 		transform(review.begin(), review.end(), review.begin(), ::tolower);
 		unStopWordsManager->eliminarStopWords(review);
+		sinonimosManager->reemplazarSinonimosDe(review);
 		tokens = tokenize(review.c_str());
 		sentimiento = getSentiment(line);
 		return true;
@@ -124,6 +127,9 @@ Parser::~Parser() {
 	}
 	if(unStopWordsManager != NULL) {
 		delete unStopWordsManager;
+	}
+	if(sinonimosManager != NULL) {
+		delete sinonimosManager;
 	}
 }
 
