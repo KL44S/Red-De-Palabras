@@ -23,7 +23,7 @@ Parser::Parser() {
 	sinonimosManager = new SinonimosManager();
 }
 
-// recive la linea con el id, sentiment y review. Devuelve review
+// recive la linea con el id, sentiment y review. Devuelve re
 string getReview_Entrenamiento(string str){
 
 	int pos = str.find("_");
