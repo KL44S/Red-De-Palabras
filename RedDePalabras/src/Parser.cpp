@@ -6,21 +6,13 @@
  */
 
 #include "Parser.h"
-#include "StopWordsManager.h"
-#include <iostream>
-#include <fstream>
-#include <math.h>
-#include <string>
-#include <string.h>
-#include "Exception.h"
-#include <ctype.h>
 #include <algorithm>
-#include <functional>
 using namespace std;
 
 Parser::Parser() {
 	unStopWordsManager = new StopWordsManager();
 	sinonimosManager = new SinonimosManager();
+	tokenizador = new Tokenizador();
 }
 
 // recive la linea con el id, sentiment y review. Devuelve re
@@ -77,13 +69,12 @@ bool Parser::setArchivo(ifstream* archivo){
 
 
 bool Parser::parsearLineaTest(){
-	if(tokens != NULL) destroy_token_list(tokens);
 	if(getline(*myfile,line)){
 		string review = getTestReview(line);
 		transform(review.begin(), review.end(), review.begin(), ::tolower);
-		unStopWordsManager->eliminarStopWords(review);
-		sinonimosManager->reemplazarSinonimosDe(review);
-		tokens = tokenize(review.c_str());
+		tokenizador->tokenizar(review);
+		unStopWordsManager->eliminarStopWords(tokenizador->getTokens());
+		sinonimosManager->reemplazarSinonimosDe(tokenizador->getTokens());
 		sentimiento = getSentiment(line);
 		lineaResultado = getid(line);
 		return true;
@@ -92,13 +83,12 @@ bool Parser::parsearLineaTest(){
 }
 
 bool Parser::parsearLineaEntrenamiento(){
-	if(tokens != NULL) destroy_token_list(tokens);
 	if(getline(*myfile,line)){
 		string review = getReview_Entrenamiento(line);
 		transform(review.begin(), review.end(), review.begin(), ::tolower);
-		unStopWordsManager->eliminarStopWords(review);
-		sinonimosManager->reemplazarSinonimosDe(review);
-		tokens = tokenize(review.c_str());
+		tokenizador->tokenizar(review);
+		unStopWordsManager->eliminarStopWords(tokenizador->getTokens());
+		sinonimosManager->reemplazarSinonimosDe(tokenizador->getTokens());
 		sentimiento = getSentiment(line);
 		return true;
 	}
@@ -108,6 +98,12 @@ bool Parser::parsearLineaEntrenamiento(){
 int Parser::getSentimiento(){
 	return sentimiento;
 }
+
+
+vector<string>* Parser::getPalabras(){
+	return (tokenizador->getTokens());
+}
+
 
 char** Parser::getTokens(){
 	return tokens;
@@ -130,6 +126,9 @@ Parser::~Parser() {
 	}
 	if(sinonimosManager != NULL) {
 		delete sinonimosManager;
+	}
+	if(tokenizador != NULL) {
+		delete tokenizador;
 	}
 }
 

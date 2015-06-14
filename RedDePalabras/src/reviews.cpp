@@ -7,17 +7,15 @@
 //============================================================================
 
 #include <iostream>
-#include <fstream>
 #include "Trie.hxx"
 #include "Exception.h"
-#include "tokenizer.h"
 #include <string.h>
 #include <string>
-#include <math.h>
 #include "Constantes.h"
-#include "StopWordsManager.h"
 #include "Parser.h"
 #include <sstream>
+#include <time.h>
+#include <math.h>
 
 using namespace std;
 
@@ -79,12 +77,16 @@ void entrenarGrafo(vector<list<nodoGrafo> >& grafo,ToolBox::Trie<int>& trie,
 
 }
 
-void entrenar(vector<list<nodoGrafo> >& grafo,ToolBox::Trie<int>& trie, char** &tokens,int& palabras){
+void entrenar(vector<list<nodoGrafo> >& grafo,ToolBox::Trie<int>& trie, vector<string>* tokens,int& palabras){
 
-	int i = 0;
-	while(tokens[i+1] != NULL){
-		entrenarGrafo(grafo,trie,tokens[i],tokens[i+1],palabras);
-		i++;
+	unsigned int i = 0;
+	char* token;
+	char* otroToken;
+
+	for(i = 0; i < (tokens->size() - 1); i++){
+		token = &tokens->at(i)[0u];
+		otroToken = &tokens->at(i + 1)[0u];
+		entrenarGrafo(grafo,trie,token,otroToken,palabras);
 	}
 }
 
@@ -116,26 +118,35 @@ int getPesoEntrePalabras(vector<list<nodoGrafo> >& grafo,ToolBox::Trie<int>& tri
 }
 
 int getPeso(vector<list<nodoGrafo> >& grafo,ToolBox::Trie<int>& trie,
-											char** &tokens){
+		vector<string>* tokens){
 
-	int i = 0;
+	unsigned int i = 0;
 	int peso = 0;
 	int actual = 0;
 	int recorrido = 0;
 
-	while(tokens[i+1] != NULL){
-		actual = getPesoEntrePalabras(grafo,trie,tokens[i],tokens[i+1]);
+	char* token;
+	char* otroToken;
+
+	for(i = 0; i < (tokens->size() - 1); i++){
+		token = &tokens->at(i)[0u];
+		otroToken = &tokens->at(i + 1)[0u];
+
+		actual = getPesoEntrePalabras(grafo,trie,token,otroToken);
 		if(actual > 0) recorrido++;
 		peso = peso + actual;
-		i++;
 	}
-
 
 	return recorrido;
 }
 
 
 int main() {
+	clock_t start_t;
+	float tiempoDeEntrenamiento;
+	float tiempoDeClasificacion;
+	int minutos;
+	int segundos;
 	int procesadas = 0;
 	int palabrasP = 0;
 	int palabrasN = 0;
@@ -143,7 +154,10 @@ int main() {
 	string porcentaje;
 	stringstream stream;
 	int sentimiento;
-	char** tokens;
+	vector<string>* tokens;
+
+	//RELOJ
+	start_t = clock();
 
 	// creo tries y grafos, positivos y negativos
 	ToolBox::Trie<int> trieP(-1);
@@ -159,11 +173,11 @@ int main() {
 		delete unParser;
 		return EJECUCION_FALLIDA;
 	}
-
+	cout << endl;
 	cout << "Entrenando..." << endl;
 	while(unParser->parsearLineaEntrenamiento()){
 		sentimiento = unParser->getSentimiento();
-		tokens = unParser->getTokens();
+		tokens = unParser->getPalabras();
 		if(sentimiento == 1) entrenar(grafoP,trieP,tokens,palabrasP);
 		else if(sentimiento == 0) entrenar(grafoN,trieN,tokens,palabrasN);
 
@@ -184,6 +198,13 @@ int main() {
 	cout << "palabras positivas: " << palabrasP << endl;
 	cout << "palabras negativas: " << palabrasN << endl;
 
+	//TIEMPOS
+	tiempoDeEntrenamiento = (((float)(clock() -start_t)) / CLOCKS_PER_SEC);
+	minutos = tiempoDeEntrenamiento / 60;
+	segundos = (int)tiempoDeEntrenamiento % 60;
+
+	cout << "Tiempo de entrenamiento: " << minutos << " minutos, " << segundos << " segundos" << endl;
+
 	//CLASIFICACION
 	cout << endl;
 	cout << "Clasificando..." << endl;
@@ -201,7 +222,7 @@ int main() {
 	}
 
 	while(unParser->parsearLineaTest()){
-		tokens = unParser->getTokens();
+		tokens = unParser->getPalabras();
 		int pesoPositivo = getPeso(grafoP,trieP,tokens);
 		int pesoNegativo = getPeso(grafoN,trieN,tokens);
 
@@ -232,9 +253,20 @@ int main() {
 		cout << "\b";
 	}
 	cout << "100% completado" << endl;
+
 	//REVIEWS POSITIVOS Y NEGATIVOS
 	cout << "Reviews negativos: " << reviewsNegativos << endl;
 	cout << "Reviews positivos: " << reviewsPositivos << endl;
+
+	//TIEMPOS
+	tiempoDeClasificacion = (((float)(clock() -start_t)) / CLOCKS_PER_SEC) - tiempoDeEntrenamiento;
+	minutos = tiempoDeClasificacion / 60;
+	segundos = (int)tiempoDeClasificacion % 60;
+	cout << "Tiempo de clasifiacion: " << minutos << " minutos, " << segundos << " segundos" << endl;
+
+	minutos = (tiempoDeClasificacion + tiempoDeClasificacion) / 60;
+	segundos = (int)(tiempoDeClasificacion + tiempoDeClasificacion) % 60;
+	cout << "Tiempo total: " << minutos << " minutos, " << segundos << " segundos" << endl;
 
 	delete unParser;
 

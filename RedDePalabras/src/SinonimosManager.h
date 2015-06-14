@@ -9,19 +9,20 @@
 #define SINONIMOSMANAGER_H_
 #include <vector>
 #include <string>
-#include <string.h>
 #include <iostream>
+#include "Tokenizador.h"
 
 namespace std {
 
 class SinonimosManager {
 public:
 	SinonimosManager();
-	void reemplazarSinonimosDe(string& unReview);
+	void reemplazarSinonimosDe(std::vector<std::string>* palabras);
 	virtual ~SinonimosManager();
 
 private:
 	std::vector< std::vector<std::string> > sinonimos;
+	Tokenizador* tokenizador;
 };
 
 } /* namespace std */

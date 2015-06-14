@@ -9,14 +9,13 @@
 #define STOPWORDSMANAGER_H_
 
 #include <iostream>
-#include <fstream>
 #include <string>
 #include <vector>
 
 class StopWordsManager {
 public:
 	StopWordsManager();
-	void eliminarStopWords(std::string& str);
+	void eliminarStopWords(std::vector<std::string>* palabras);
 	virtual ~StopWordsManager();
 
 private:

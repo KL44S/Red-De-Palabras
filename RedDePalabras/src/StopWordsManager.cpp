@@ -6,7 +6,7 @@
  */
 
 #include "StopWordsManager.h"
-#include <vector>
+#include <fstream>
 
 StopWordsManager::StopWordsManager() {
 	stopWords = std::vector<std::string>();
@@ -15,22 +15,7 @@ StopWordsManager::StopWordsManager() {
 	std::ifstream myfile ("stopWords.txt");
 	if (myfile.is_open()){
 		while (getline(myfile,line)){
-			stopWords.push_back(" " + line + " ");
-			stopWords.push_back("," + line + " ");
-			stopWords.push_back(" " + line + ",");
-			stopWords.push_back("." + line + " ");
-			stopWords.push_back(" " + line + ".");
-			stopWords.push_back("," + line + ",");
-			stopWords.push_back("." + line + ".");
-			stopWords.push_back("," + line + ".");
-			stopWords.push_back("." + line + ",");
-			stopWords.push_back(";" + line + " ");
-			stopWords.push_back(" " + line + ";");
-			stopWords.push_back(";" + line + ";");
-			stopWords.push_back(";" + line + ",");
-			stopWords.push_back("," + line + ";");
-			stopWords.push_back(";" + line + ".");
-			stopWords.push_back("." + line + ";");
+			stopWords.push_back(line);
 
 		}
 		myfile.close();
@@ -40,17 +25,11 @@ StopWordsManager::StopWordsManager() {
 }
 
 
-void StopWordsManager::eliminarStopWords(std::string& str){
-	int pos;
+void StopWordsManager::eliminarStopWords(std::vector<std::string>* palabras){
 	std::string stopWord;
-	size_t tamanio;
 	for(size_t i = 0; i < stopWords.size(); i++){
-		stopWord = stopWords.at(i);
-		tamanio = stopWord.size() - 1;
-		pos = str.find(stopWord);
-		while (pos != -1){
-			str.erase(pos, tamanio);
-			pos = str.find(stopWord);
+		for(size_t j = 0; j < palabras->size(); j++){
+			if(stopWords.at(i) == palabras->at(j)) palabras->erase(palabras->begin() + j);
 		}
 	}
 	//std::cout << "string sin stop word: " << str << std::endl;

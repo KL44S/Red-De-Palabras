@@ -7,15 +7,13 @@
 
 #ifndef PARSER_H_
 #define PARSER_H_
-#include "tokenizer.h"
 #include "StopWordsManager.h"
 #include "SinonimosManager.h"
 #include <iostream>
 #include <fstream>
-#include <math.h>
 #include <string>
-#include <string.h>
-#include "Exception.h"
+#include <vector>
+#include "Tokenizador.h"
 using namespace std;
 
 class Parser {
@@ -26,6 +24,7 @@ public:
 	bool parsearLineaTest();
 	int getSentimiento();
 	char** getTokens();
+	vector<string>* getPalabras();
 	string getLine();
 	string getLineaResultado();
 	virtual ~Parser();
@@ -33,6 +32,7 @@ public:
 private:
 	StopWordsManager* unStopWordsManager;
 	SinonimosManager* sinonimosManager;
+	Tokenizador* tokenizador;
 	int sentimiento;
 	char** tokens;
 	string line;
