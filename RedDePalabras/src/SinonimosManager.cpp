@@ -23,7 +23,7 @@ SinonimosManager::SinonimosManager() {
 	if(miArchivo.is_open()){
 		while(getline(miArchivo,sinonimo)) {
 			transform(sinonimo.begin(), sinonimo.end(), sinonimo.begin(), ::tolower);
-			tokenizador->tokenizar(sinonimo);
+			tokenizador->tokenizarConSeparador(sinonimo, ',');
 			palabras = tokenizador->getTokens();
 			if(!palabras->empty()) {
 				std::vector<std::string> vecSinonimos = std::vector<std::string>();
@@ -46,21 +46,40 @@ void SinonimosManager::reemplazarSinonimosDe(std::vector<std::string>* palabras)
 	string sinonimo;
 	string sinonimoAreemplazar;
 	string* palabra;
+	string auxiliar;
 	std::vector<std::string>* vecSinonimos;
+	unsigned int cantidadDePalabras = 0;
 
 	for(size_t i = 0; i < sinonimos.size(); i++){
 		vecSinonimos = &(sinonimos.at(i));
 
 		if(!vecSinonimos->empty()){
 			for(size_t k = 0 ; k < vecSinonimos->size(); k++){
+				cantidadDePalabras = 0;
 				if(k == 0) sinonimo = vecSinonimos->at(0);
 				else{
 					sinonimoAreemplazar = vecSinonimos->at(k);
+					for(size_t o = 0; o < sinonimoAreemplazar.size(); o++){
+						if(sinonimoAreemplazar.at(o) == ' ') cantidadDePalabras++;
+					}
 					for(size_t j = 0; j < palabras->size(); j++){
 						palabra = &(palabras->at(j));
-						if(*palabra == sinonimoAreemplazar) {
-							*palabra = sinonimo;
+						auxiliar = *palabra;
+						if((j + cantidadDePalabras) < palabras->size()){
+							for(size_t l = 0; l < cantidadDePalabras; l++){
+								auxiliar += " " + palabras->at(j + (l + 1));
+							}
+
 						}
+						if(auxiliar == sinonimoAreemplazar) {
+							*palabra = sinonimo;
+							if((j + cantidadDePalabras) < palabras->size()){
+								for(size_t h = 0; h < cantidadDePalabras; h++){
+									palabras->erase(palabras->begin() + (j + h + 1));
+								}
+							}
+						}
+
 					}
 				}
 			}

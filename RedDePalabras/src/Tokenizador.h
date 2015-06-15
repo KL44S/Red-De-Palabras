@@ -14,6 +14,7 @@ class Tokenizador {
 public:
 	Tokenizador();
 	void tokenizar(std::string unReview);
+	void tokenizarConSeparador(std::string unReview, char unSeparador);
 	std::vector<std::string>* getTokens();
 	virtual ~Tokenizador();
 
